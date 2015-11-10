@@ -48,36 +48,25 @@ abstract class CartController extends CoreController
 
     public function actionAdd($uniqueId, $quantity = 1, $type = null)
     {
-        $isAjax = $this->request->isAjax;
         $cart = $this->getCart();
         if ($this->addInternal($uniqueId, $quantity, $type)) {
-            if ($isAjax) {
-                echo $this->json([
-                    'status' => true,
-                    'total' => $cart->getTotal(),
-                    'message' => [
-                        'title' => CartModule::t('Product added')
-                    ]
-                ]);
-                Mindy::app()->end();
-            } else {
-                $this->request->flash->success(CartModule::t('Product added'));
-                $this->request->redirect($this->getListRoute());
-            }
+            echo $this->json([
+                'status' => true,
+                'total' => $cart->getTotal(),
+                'message' => [
+                    'title' => CartModule::t('Product added')
+                ]
+            ]);
+            Mindy::app()->end();
         } else {
-            if ($isAjax) {
-                echo $this->json([
-                    'status' => false,
-                    'total' => $cart->getTotal(),
-                    'message' => [
-                        'title' => CartModule::t('Error has occurred')
-                    ]
-                ]);
-                Mindy::app()->end();
-            } else {
-                $this->request->flash->success(CartModule::t('Error has occurred'));
-                $this->request->redirect($this->getListRoute());
-            }
+            echo $this->json([
+                'status' => false,
+                'total' => $cart->getTotal(),
+                'message' => [
+                    'title' => CartModule::t('Error has occurred')
+                ]
+            ]);
+            Mindy::app()->end();
         }
     }
 
@@ -165,6 +154,41 @@ abstract class CartController extends CoreController
         }
     }
 
+    public function actionUpdate($key, $uniqueId, $quantity, $type)
+    {
+        $isAjax = $this->request->isAjax;
+        $cart = $this->getCart();
+        if ($this->updateInternal($key, $uniqueId, $quantity, $type)) {
+            if ($isAjax) {
+                echo $this->json([
+                    'status' => true,
+                    'total' => $cart->getTotal(),
+                    'message' => [
+                        'title' => CartModule::t('Position updated')
+                    ]
+                ]);
+                Mindy::app()->end();
+            } else {
+                $this->request->flash->success(CartModule::t('Position updated'));
+                $this->request->redirect($this->getListRoute());
+            }
+        } else {
+            if ($isAjax) {
+                echo $this->json([
+                    'status' => false,
+                    'total' => $cart->getTotal(),
+                    'error' => [
+                        'title' => CartModule::t('Error has occurred')
+                    ]
+                ]);
+                Mindy::app()->end();
+            } else {
+                $this->request->flash->success(CartModule::t('Error has occurred'));
+                $this->request->redirect($this->getListRoute());
+            }
+        }
+    }
+
     public function actionDecrease($key)
     {
         $isAjax = $this->request->isAjax;
@@ -204,37 +228,28 @@ abstract class CartController extends CoreController
     {
         $cart = $this->getCart();
         $deleted = $cart->removeByKey($key);
-        $isAjax = $this->request->isAjax;
         if ($deleted) {
-            if ($isAjax) {
-                echo $this->json([
-                    'status' => true,
-                    'total' => $cart->getTotal(),
-                    'message' => [
-                        'title' => CartModule::t('Position sucessfully removed'),
-                    ]
-                ]);
-                Mindy::app()->end();
-            } else {
-                $this->request->flash->success(CartModule::t('Position sucessfully removed'));
-                $this->request->redirect($this->getListRoute());
-            }
+            echo $this->json([
+                'status' => true,
+                'total' => $cart->getTotal(),
+                'message' => [
+                    'title' => CartModule::t('Position sucessfully removed'),
+                ]
+            ]);
+            Mindy::app()->end();
         } else {
-            if ($isAjax) {
-                echo $this->json([
-                    'status' => false,
-                    'total' => $cart->getTotal(),
-                    'error' => [
-                        'title' => CartModule::t('Error has occurred'),
-                    ]
-                ]);
-                Mindy::app()->end();
-            } else {
-                $this->request->flash->error(CartModule::t('Error has occurred'));
-                $this->request->redirect($this->getListRoute());
-            }
+            echo $this->json([
+                'status' => false,
+                'total' => $cart->getTotal(),
+                'error' => [
+                    'title' => CartModule::t('Error has occurred'),
+                ]
+            ]);
+            Mindy::app()->end();
         }
     }
 
     abstract protected function addInternal($uniqueId, $quantity, $type);
+
+    abstract protected function updateInternal($key, $uniqueId, $quantity, $type);
 }

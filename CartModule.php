@@ -43,6 +43,9 @@ class CartModule extends Module
         $this->setComponent('cart', $this->cartConfig);
     }
 
+    /**
+     * @return \Modules\Cart\Components\Cart
+     */
     public function getCart()
     {
         return $this->getComponent('cart');
